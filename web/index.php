@@ -1,20 +1,12 @@
 <?php
     require 'vendor/autoload.php';
+    require 'templates/autoload.php';
+        
+    $dao = new Dao();
  
     //instancie o objeto
     $app = new \Slim\Slim();
- 
-    //defina a rota
-    $app->get('/', function () use ($app)
-    { 
-        //defina os dados que serão retornado
-        $data = array('data' => array('Hello' => 'World!')); 
         
-        //set o arquivo de template
-        $app->render('default.php', $data, 200);
-    }); 
-    
-    
     //Cria um grupo usuarios onde todas as consultas relacionadas ao usuario 
     //deverá vir precedida do /usuarios
     $app->group('/usuarios', function() use($app)
