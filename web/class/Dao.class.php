@@ -8,13 +8,16 @@ class Dao
     private $properties;
     private $name;
     private $label;
+    private $query;
+    private $conexao;
     
     //Metodo construtor da classe
     public function __construct()
     {
-        $this->data = array();
-        $this->query = NULL;
+        $this->data  = array();
+        $this->query  = NULL;
         $this->is_new = TRUE;
+        $this->table  = 'pessoa';
         
         //verifica se existe o arquivo de configuração para este banco de dados
         if (file_exists(CONFIG))
@@ -64,33 +67,68 @@ class Dao
      * Retorno:
     */
     public function setProperties()
-    {
-        $select = new SelectSql();        
-                
-        if ($this->tipo == 'mysql')
+    {                  
+        try 
         {
-            $select->setEntidade('information_schema.COLUMNS');
-            $select->addColuna('COLUMN_NAME AS Campos');
-            $select->addColuna('IF(COLUMN_KEY = "PRI, "S", "N") AS Primary_Key');
+            $this->query = new SelectSql();     
+
+            if ($this->tipo == 'mysql')
+            {
+                $this->query->setEntidade('information_schema.COLUMNS');
+                $this->query->addColuna('COLUMN_NAME AS campos');
+                $this->query->addColuna('IF(COLUMN_KEY = "PRI", "S", "N") AS primary_key');
+
+                $criterio = new Criterio; 
+                $criterio->add(new Filtro('TABLE_SCHEMA', '=',  $this->database));
+                $criterio->add(new Filtro('TABLE_NAME',   '=',  $this->table));
+
+                /*$sql = "SELECT COLUMN_NAME AS Campos, IF(COLUMN_KEY = 'PRI', 'S', 'N') AS Primary_Key"
+                     . "FROM information_schema.COLUMNS"
+                     . "WHERE TABLE_SCHEMA = '{$this->database}' AND "
+                     . "TABLE_NAME = '{$this->table}';";  */                                    
+            }
+            else if ($this->tipo == 'mssql')
+            {
+                /*$sql = "SELECT properties=syscolumns.name "
+                     . "FROM syscolumns LEFT JOIN sysobjects ON sysobjects.id = syscolumns.id "
+                     . "WHERE sysobjects.name = {$this->table};";*/
+
+                $this->query->setEntidade('syscolumns LEFT JOIN sysobjects ON sysobjects.id = syscolumns.id');
+                $this->query->addColuna('properties=syscolumns.name');
+
+                $criterio = new Criterio; 
+                $criterio->add(new Filtro('sysobjects.name', '=', $this->table));                 
+            }
+
+            $this->query->setCriterio($criterio);            
+                        
+            $this->conexao = Conexao::abrir(CONFIG);
+            $resultado = $this->conexao->query($this->query->getInstrucao());
             
-            $criterio = new Criterio();
-            $criterio->add("TABLE_SCHEMA", $this->database);
-            $criterio->add("TABLE_NAME", $this->database);
+            if ($resultado)
+            {                               
+                while($linhas = $resultado->fetch(PDO::FETCH_ASSOC))
+                {
+                    if ($linhas['primary_key'] == 'S')
+                    {
+                        $this->primaryKey = $linhas['campos'];
+                    }
+                    else
+                    {
+                        $this->properties[] = $linhas['campos'];
+                    }     
+                }
+            }
             
-            
-            $sql = "SELECT COLUMN_NAME AS Campos, IF(COLUMN_KEY = 'PRI', 'S', 'N') AS Primary_Key"
-                 . "FROM information_schema.COLUMNS"
-                 . "WHERE TABLE_SCHEMA = '{$this->database}' AND "
-                 . "TABLE_NAME = '{$this->table}';";                                      
-        }
-        else if ($this->tipo == 'mssql')
+            unset($this->conexao); 
+            unset($this->query); 
+        } 
+        catch (PDOException $erro) 
         {
-            $sql = "SELECT properties=syscolumns.name "
-                 . "FROM syscolumns LEFT JOIN sysobjects ON sysobjects.id = syscolumns.id "
-                 . "WHERE sysobjects.name = {$this->table};";
+            echo "{$erro->getMessage()} :: {$this->query->getInstrucao()}";
+            exit;
         }
-        $this->properties = $result;
-        $this->primaryKey = $result[0];
+       
     }    
     
 }

@@ -1,9 +1,7 @@
 <?php
     require 'vendor/autoload.php';
     require 'templates/autoload.php';
-        
-    $dao = new Dao();
- 
+         
     //instancie o objeto
     $app = new \Slim\Slim();
         
@@ -12,7 +10,7 @@
     $app->group('/usuarios', function() use($app)
     {
         //rota para a home
-        $app->get('/',function() use ($app)
+        /*$app->get('/',function() use ($app)
         {
             //exemplo de lista de usuarios
             $users = array
@@ -32,19 +30,24 @@
             );
             
             $app->render('default.php', $data, 200);
-        });
+        });*/
  
         //rota para login
-        $app->post('/login/',function() use ($app)
+        $app->post('/login/', function() use ($app)
         {
             if(isset($_POST))
             {
                 $data = $_POST;
+                        
+                $pessoa = new Pessoa();
+                $pessoa->efetuaLogin($data['email'], $data['senha']);
                 $app->render('default.php', $data, 200);
+                echo 'Aqui';
             }
             else
             {
                 $app->render(404);
+                echo 'Aqui erro';
             }
         });
     });
