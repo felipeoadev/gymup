@@ -23,6 +23,7 @@ class Pessoa extends Dao
            
             $conn = Conexao::abrir(CONFIG);
             $resultado = $conn->query($procedure->getInstrucao(0));
+           
             return $resultado->fetch(PDO::FETCH_ASSOC);
         }
         catch (PDOException $erro) 

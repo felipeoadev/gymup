@@ -5,10 +5,16 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.google.gson.Gson;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.Reader;
+import java.net.HttpURLConnection;
+import java.net.URI;
 
 /**
  * Created by UPBrTecnologia on 10/09/2015.
@@ -139,4 +145,5 @@ public class Banco extends SQLiteOpenHelper
             return getWritableDatabase();
         }
     }
+
 }

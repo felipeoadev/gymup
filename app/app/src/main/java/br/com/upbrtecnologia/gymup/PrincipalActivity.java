@@ -11,14 +11,15 @@ import android.view.View;
 import br.com.upbrtecnologia.gymup.controller.Pessoa;
 import br.com.upbrtecnologia.gymup.database.Banco;
 
-public class PrincipalActivity extends AppCompatActivity {
-
+public class PrincipalActivity extends AppCompatActivity
+{
     private EditText editTextUsuario;
     private EditText editTextSenha;
     private Button buttonLogar;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_principal);
 
@@ -44,7 +45,7 @@ public class PrincipalActivity extends AppCompatActivity {
                 {
                     if (pessoa.verificaUsuario(editTextUsuario.getText().toString(), editTextSenha.getText().toString()) == true)
                     {
-                        aviso.setMessage("Login efetuado com sucesso");
+                        aviso.setMessage("Login efetuado com sucesso "+pessoa.gerarHashMD5(editTextSenha.getText().toString()));
                         aviso.setNeutralButton("OK", null);
                         aviso.show();
                     }
@@ -55,8 +56,6 @@ public class PrincipalActivity extends AppCompatActivity {
                         aviso.show();
                     }
                 }
-
-
             }
         });
     }

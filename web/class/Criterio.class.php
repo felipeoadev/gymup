@@ -16,7 +16,7 @@ class Criterio extends Expressao
   */
  public function add(Expressao $expressao, $operador = self::AND_OPERATOR)
  {
-  //Na primeira vez não precisamos de operador lógico para concatenar
+  //Na primeira vez não precisamos de operador lógico para concatenar]              
   if(empty($this->expressoes))
   {
    unset($operador);

@@ -15,7 +15,7 @@
      */
     public function addParametro($parametro)
     {
-        $filtro = new Filtro();    
+        $filtro = new Filtro('', '', '');    
             
         if (is_array($parametro))
         {
